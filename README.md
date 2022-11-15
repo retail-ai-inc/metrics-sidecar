@@ -22,6 +22,9 @@ Please do not set any health check probes, otherwise its health status may affec
       - image: asia.gcr.io/smartcart-stagingization/metrics-sidecar:develop
         imagePullPolicy: Always
         name: metrics
+        env:
+          name: METRICS_SIDECAR_PORT
+          value: "9999"
         ports:
         - containerPort: 9999
         resources:

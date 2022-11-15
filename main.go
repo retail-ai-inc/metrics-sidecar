@@ -104,9 +104,13 @@ port_total{pod_name="%s"} %d`
 }
 
 func main() {
+	port := os.Getenv("METRICS_SIDECAR_PORT")
+	if "" == port {
+		port = "9999"
+	}
 	log.Println("Metrics server start...")
 	http.HandleFunc("/metrics", metricsHandler)
-	http.ListenAndServe("0.0.0.0:9999", nil)
+	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
 
 func init() {
