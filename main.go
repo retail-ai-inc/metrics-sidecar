@@ -28,6 +28,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strconv"
+	"time"
 
 	"github.com/prometheus/procfs"
 )
@@ -103,7 +104,13 @@ port_total{pod_name="%s"} %d`
 	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount)
 
 	w.Write([]byte(output))
-	debug.FreeOSMemory()
+}
+
+func freeMemory() {
+	for {
+		time.Sleep(5 * time.Minute)
+		debug.FreeOSMemory()
+	}
 }
 
 func main() {
@@ -112,6 +119,7 @@ func main() {
 		port = "9999"
 	}
 	log.Println("Metrics server start...")
+	go freeMemory()
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
