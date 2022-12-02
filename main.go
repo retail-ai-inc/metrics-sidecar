@@ -26,7 +26,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"strconv"
+
 	"github.com/prometheus/procfs"
 )
 
@@ -101,6 +103,7 @@ port_total{pod_name="%s"} %d`
 	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount)
 
 	w.Write([]byte(output))
+	debug.FreeOSMemory()
 }
 
 func main() {
