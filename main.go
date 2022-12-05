@@ -106,20 +106,12 @@ port_total{pod_name="%s"} %d`
 	w.Write([]byte(output))
 }
 
-func freeMemory() {
-	for {
-		time.Sleep(5 * time.Minute)
-		debug.FreeOSMemory()
-	}
-}
-
 func main() {
 	port := os.Getenv("METRICS_SIDECAR_PORT")
 	if "" == port {
 		port = "9999"
 	}
 	log.Println("Metrics server start...")
-	go freeMemory()
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
