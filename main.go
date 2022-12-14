@@ -124,7 +124,7 @@ func main() {
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
 
-func init() {
-	getPodName()
-	getPortTotalCount()
-}
+// func init() {
+// 	getPodName()
+// 	getPortTotalCount()
+// }
