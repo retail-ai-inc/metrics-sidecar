@@ -100,15 +100,19 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	portUsedCount := getPortUsedCount()
 	podName := getPodName()
 	portTotalCount := getPortTotalCount()
+	usage := float64(portUsedCount) / float64(portTotalCount) * 100
 
 	outputFormat := `# HELP port_used Used Local Port Count
 # TYPE port_used gauge
 port_used{pod_name="%s"} %d
 # HELP port_total Total Local Port Count
 # TYPE port_total gauge
-port_total{pod_name="%s"} %d`
+port_total{pod_name="%s"} %d
+# HELP port_usage Local Port Usage
+# TYPE port_usage gauge
+port_usage{pod_name="%s"} %d`
 
-	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount)
+	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount, podName, usage)
 
 	w.Write([]byte(output))
 	// debug.FreeOSMemory()
@@ -120,6 +124,7 @@ func main() {
 		port = "9999"
 	}
 	log.Println("Metrics server start...")
+	log.Println(float64(66) / float64(77) * 100)
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
