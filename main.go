@@ -26,52 +26,54 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"runtime/debug"
+	// "runtime/debug"
 	"strconv"
 
 	"github.com/prometheus/procfs"
 )
 
-var podName string
-var portTotalCount int
+// var podName string
+// var portTotalCount int
 
-func getPodName() {
+func getPodName() string {
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Println("Failed to get pod name.")
-		return
+		return ""
 	}
-	podName = hostname
+	return hostname
+	// podName = hostname
 }
 
-func getPortTotalCount() {
+func getPortTotalCount() int {
 	procFS, err := procfs.NewFS("/proc")
 	if err != nil {
 		log.Println("Failed to read /proc.")
-		return
+		return 0
 	}
 
 	portsArr, err := procFS.SysctlStrings("net/ipv4/ip_local_port_range")
 	if err != nil {
 		log.Println("Failed to read local port range.")
-		return
+		return 0
 	}
 	if len(portsArr) < 2 {
 		log.Println("Incorrect format of local port range.")
-		return
+		return 0
 	}
 
 	firstPort, err := strconv.Atoi(portsArr[0])
 	if err != nil {
 		log.Println("Failed to read first local port number.")
-		return
+		return 0
 	}
 	lastPort, err := strconv.Atoi(portsArr[1])
 	if err != nil {
 		log.Println("Failed to read last local port number.")
-		return
+		return 0
 	}
-	portTotalCount = lastPort - firstPort + 1
+	portTotalCount := lastPort - firstPort + 1
+	return portTotalCount
 }
 
 func getPortUsedCount() int {
@@ -95,7 +97,9 @@ func aaaaaaa() int {
 }
 
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
-	portUsedCount := aaaaaaa()
+	portUsedCount := getPortUsedCount()
+	podName := getPodName()
+	portTotalCount := getPortTotalCount()
 
 	outputFormat := `# HELP port_used Used Local Port Count
 # TYPE port_used gauge
@@ -107,7 +111,7 @@ port_total{pod_name="%s"} %d`
 	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount)
 
 	w.Write([]byte(output))
-	debug.FreeOSMemory()
+	// debug.FreeOSMemory()
 }
 
 func main() {
