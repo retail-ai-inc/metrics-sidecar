@@ -46,33 +46,34 @@ func getPodName() string {
 }
 
 func getPortTotalCount() int {
+	portTotalCount := 1
 	procFS, err := procfs.NewFS("/proc")
 	if err != nil {
 		log.Println("Failed to read /proc.")
-		return 0
+		return portTotalCount
 	}
 
 	portsArr, err := procFS.SysctlStrings("net/ipv4/ip_local_port_range")
 	if err != nil {
 		log.Println("Failed to read local port range.")
-		return 0
+		return portTotalCount
 	}
 	if len(portsArr) < 2 {
 		log.Println("Incorrect format of local port range.")
-		return 0
+		return portTotalCount
 	}
 
 	firstPort, err := strconv.Atoi(portsArr[0])
 	if err != nil {
 		log.Println("Failed to read first local port number.")
-		return 0
+		return portTotalCount
 	}
 	lastPort, err := strconv.Atoi(portsArr[1])
 	if err != nil {
 		log.Println("Failed to read last local port number.")
-		return 0
+		return portTotalCount
 	}
-	portTotalCount := lastPort - firstPort + 1
+	portTotalCount = lastPort - firstPort + 1
 	return portTotalCount
 }
 
@@ -100,7 +101,7 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	portUsedCount := getPortUsedCount()
 	podName := getPodName()
 	portTotalCount := getPortTotalCount()
-	usage := float64(portUsedCount) / float64(portTotalCount) * 100
+	portUsage := float32(portUsedCount) * 100 / float32(portTotalCount)
 
 	outputFormat := `# HELP port_used Used Local Port Count
 # TYPE port_used gauge
@@ -110,9 +111,9 @@ port_used{pod_name="%s"} %d
 port_total{pod_name="%s"} %d
 # HELP port_usage Local Port Usage
 # TYPE port_usage gauge
-port_usage{pod_name="%s"} %d`
+port_usage{pod_name="%s"} %f`
 
-	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount, podName, usage)
+	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount, podName, portUsage)
 
 	w.Write([]byte(output))
 	// debug.FreeOSMemory()
