@@ -26,14 +26,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	// "runtime/debug"
 	"strconv"
 
 	"github.com/prometheus/procfs"
 )
-
-// var podName string
-// var portTotalCount int
 
 func getPodName() string {
 	hostname, err := os.Hostname()
@@ -42,7 +38,6 @@ func getPodName() string {
 		return ""
 	}
 	return hostname
-	// podName = hostname
 }
 
 func getPortTotalCount() int {
@@ -93,13 +88,9 @@ func getPortUsedCount() int {
 	return len(netTCP)
 }
 
-func aaaaaaa() int {
-	return 99
-}
-
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
-	portUsedCount := getPortUsedCount()
 	podName := getPodName()
+	portUsedCount := getPortUsedCount()
 	portTotalCount := getPortTotalCount()
 	portUsage := float32(portUsedCount) * 100 / float32(portTotalCount)
 
@@ -109,14 +100,13 @@ port_used{pod_name="%s"} %d
 # HELP port_total Total Local Port Count
 # TYPE port_total gauge
 port_total{pod_name="%s"} %d
-# HELP port_usage Local Port Usage
+# HELP port_usage Local Port Usage Percentage
 # TYPE port_usage gauge
 port_usage{pod_name="%s"} %f`
 
 	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount, podName, portUsage)
 
 	w.Write([]byte(output))
-	// debug.FreeOSMemory()
 }
 
 func main() {
@@ -128,8 +118,3 @@ func main() {
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
-
-// func init() {
-// 	getPodName()
-// 	getPortTotalCount()
-// }
