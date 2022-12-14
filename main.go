@@ -90,8 +90,12 @@ func getPortUsedCount() int {
 	return len(netTCP)
 }
 
+func aaaaaaa() int {
+	return 99
+}
+
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
-	portUsedCount := getPortUsedCount()
+	portUsedCount := aaaaaaa()
 
 	outputFormat := `# HELP port_used Used Local Port Count
 # TYPE port_used gauge
