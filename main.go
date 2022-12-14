@@ -124,7 +124,6 @@ func main() {
 		port = "9999"
 	}
 	log.Println("Metrics server start...")
-	log.Println(float64(66) / float64(77) * 100)
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:" + port, nil)
 }
