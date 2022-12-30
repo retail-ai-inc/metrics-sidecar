@@ -75,4 +75,7 @@ port_used{pod_name="manju-7744b786fc-jvftc"} 345
 # HELP port_total Total Local Port Count
 # TYPE port_total gauge
 port_total{pod_name="manju-7744b786fc-jvftc"} 28888
+# HELP port_usage Local Port Usage Percentage
+# TYPE port_usage gauge
+port_usage{pod_name="manju-7744b786fc-jvftc"} 5.55
 ```
