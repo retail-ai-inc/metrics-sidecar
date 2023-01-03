@@ -1,0 +1,24 @@
+options:
+  env:
+  - GO111MODULE=on
+  machineType: 'E2_HIGHCPU_8'
+
+steps:
+- name: 'golang:1.18'
+  entrypoint: "bash"
+  args: ['-c', 'go build -ldflags="-s -w" -race -o bin/metrics-sidecar main.go']
+
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args: [ 
+          '-c',
+          'docker build -t asia.gcr.io/$PROJECT_ID/metrics-sidecar:$_BRANCH_ -t asia.gcr.io/$PROJECT_ID/metrics-sidecar:$SHORT_SHA .'
+        ]
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/metrics-sidecar:$SHORT_SHA']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/metrics-sidecar:$_BRANCH_']
+
+timeout: 2400s
