@@ -1,7 +1,7 @@
 # What is Metrics-Sidecar
 
-`Metrics-Sidecar` is a way to monitor local port usage of containers:
-- How many local ports are inuse.
+`Metrics-Sidecar` is a way to monitor local port usage of a pod:
+- How many local ports are in use.
 - How many local ports can be used totally.
 
 `Metrics-Sidecar` runs as an extra container of business pods. Since all containers share the same network namespace in one pod, so we can get the business network information from the `Metrics-Sidecar` container. In addition, we need expose a API `/metrics` so that `Prometheus` can scrape metrics data from `Metrics-Sidecar`.
@@ -10,7 +10,7 @@ In order to avoid impact on the business container, `Metrics-Sidecar` container 
 
 # How to Use Metrics-Sidecar
 
-Suppose that we want to monitor the port usage of `manju` container, we should perform the following steps.
+Suppose that we want to monitor the port usage of an `Application` container written in any programming language. Therfore, we should perform the following steps.
 
 ## Add a Metrics Container to Target Business Pod
 
