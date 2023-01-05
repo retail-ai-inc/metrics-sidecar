@@ -10,7 +10,7 @@ In order to avoid impact on the business container, `Metrics-Sidecar` container 
 
 # How to Use Metrics-Sidecar
 
-Suppose that we want to monitor the port usage of `manju` container, we should perform the following steps.
+Suppose that we want to monitor the port usage of an `Application` container written in any programming language. Therfore, we should perform the following steps.
 
 ## Add a Metrics Container to Target Business Pod
 
