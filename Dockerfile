@@ -12,11 +12,21 @@
 #
 # Reference: https://github.com/GoogleContainerTools/distroless/blob/main/base/README.md
 
+FROM golang:1.18 AS builder
+
+COPY go.mod /go/metrics-sidecar/
+COPY go.sum /go/metrics-sidecar/
+COPY main.go /go/metrics-sidecar/
+
+WORKDIR /go/metrics-sidecar/
+
+RUN go build -ldflags="-s -w" -o bin/metrics-sidecar main.go
+
 FROM gcr.io/distroless/base
 
 LABEL maintainer="Zhang Debo <zhang_debo@c.tre-inc.com>"
 
-COPY bin/metrics-sidecar /metrics-sidecar
+COPY --from=builder /go/metrics-sidecar/bin/metrics-sidecar /metrics-sidecar
 
 EXPOSE 9999
 
