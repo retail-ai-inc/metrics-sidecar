@@ -39,7 +39,7 @@ Edit `Application` workload, add an extra container using image `metrics-sidecar
 
 ## Create a New Service for Metrics-Sidecar
 
-As following, `namespace` and `selector` should be same as target `Application` service, `targetPort` is the port of metrics service, `annotations` are necessary so that `prometheus` can scrape data from here.
+As following, `namespace` and `selector` should be same as target `Application` service, `targetPort` is the port of metrics service, `annotations` are necessary so that `Prometheus` can scrape data from here.
 
 ```
 apiVersion: v1
@@ -78,7 +78,7 @@ port_total{pod_name="<pod_name>"} 28232
 port_usage{pod_name="<pod_name>"} 5.667
 ```
 
-# Create charts for better viewing
+# Create Charts for Better Viewing
 
 If you are using GCP Monitoring, you can create a monitoring line chart to show metrics data, click [here](https://cloud.google.com/monitoring/charts/metrics-explorer) for more guidance. Finally, you can see a chart like following.
 
