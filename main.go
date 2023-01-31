@@ -39,20 +39,20 @@ var portNameMap map[uint64]string = map[uint64]string{
 	443: "https",
 }
 
-var portStateArray []string = []string{
+var stateArray []string = []string{
 	"",
 	"ESTABLISHED",
-    "SYN_SENT",
-    "SYN_RECV",
-    "FIN_WAIT1",
-    "FIN_WAIT2",
-    "TIME_WAIT",
-    "CLOSE",
-    "CLOSE_WAIT",
-    "LAST_ACK",
-    "LISTEN",
-    "CLOSING",
-    "NEW_SYN_RECV",
+	"SYN_SENT",
+	"SYN_RECV",
+	"FIN_WAIT1",
+	"FIN_WAIT2",
+	"TIME_WAIT",
+	"CLOSE",
+	"CLOSE_WAIT",
+	"LAST_ACK",
+	"LISTEN",
+	"CLOSING",
+	"NEW_SYN_RECV",
 }
 
 func getPodName() string {
@@ -114,7 +114,7 @@ func getPortUsed() map[string]map[string]int {
 	// group TCP connections by "remote addr" and "state"
 	portStatistics["OTHER"] = make(map[string]int)
 	for _, c := range netTCP {
-		portState := portStateArray[c.St]
+		portState := stateArray[c.St]
 		if c.RemPort < 32768 {
 			portName := portNameMap[c.RemPort]
 			if "" == portName {
