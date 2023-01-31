@@ -30,11 +30,11 @@ Edit `Application` workload, add an extra container using image `metrics-sidecar
         - containerPort: 9999
         resources:
           limits:
-            cpu: 250m
-            memory: 128Mi
+            cpu: 50m
+            memory: 50Mi
           requests:
-            cpu: 250m
-            memory: 128Mi
+            cpu: 50m
+            memory: 50Mi
 ```
 
 ## Create a New Service for Metrics-Sidecar
@@ -64,12 +64,21 @@ spec:
 
 # How the Metrics Data Looks Like
 
-The data format complies with the requirements of `Prometheus`.
+There are 3 metrics related to Port Usage:
+- **port_used**: How many local ports are in use.
+- **port_total**: How many local ports are available totally.
+- **port_usage**: Local ports in use as a percentage of total.
+
+In addition, `port_used` are grouped by `remote addr` and `state`. There are also some connections with a temporary port number as remote port, they are counted together as `OTHER`.
+
+The response data format complies with the requirements of `Prometheus`.
 
 ```
 # HELP port_used Used Local Port Count
 # TYPE port_used gauge
-port_used{pod_name="<pod_name>"} 1600
+port_used{pod_name="<pod_name>",remote_addr="<remote_ip_0> [<remote_port_0>:<port_name_0>]",state="ESTABLISHED"} 800
+port_used{pod_name="<pod_name>",remote_addr="<remote_ip_1> [<remote_port_1>:<port_name_1>]",state="TIME_WAIT"} 500
+port_used{pod_name="<pod_name>",remote_addr="OTHER",state="TIME_WAIT"} 300
 # HELP port_total Total Local Port Count
 # TYPE port_total gauge
 port_total{pod_name="<pod_name>"} 28232

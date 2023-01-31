@@ -27,9 +27,33 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-
 	"github.com/prometheus/procfs"
 )
+
+var portNameMap map[uint64]string = map[uint64]string{
+	3306: "mysql",
+	6379: "redis",
+	27017: "mongo",
+	80: "http",
+	8080: "http",
+	443: "https",
+}
+
+var portStateArray []string = []string{
+	"",
+	"ESTABLISHED",
+    "SYN_SENT",
+    "SYN_RECV",
+    "FIN_WAIT1",
+    "FIN_WAIT2",
+    "TIME_WAIT",
+    "CLOSE",
+    "CLOSE_WAIT",
+    "LAST_ACK",
+    "LISTEN",
+    "CLOSING",
+    "NEW_SYN_RECV",
+}
 
 func getPodName() string {
 	hostname, err := os.Hostname()
@@ -72,39 +96,75 @@ func getPortTotalCount() int {
 	return portTotalCount
 }
 
-func getPortUsedCount() int {
+func getPortUsed() map[string]map[string]int {
+	portStatistics := map[string]map[string]int{}
+
 	procFS, err := procfs.NewFS("/proc")
 	if err != nil {
 		log.Println("Failed to read /proc.")
-		return 0
+		return portStatistics
 	}
 
 	netTCP, err := procFS.NetTCP()
 	if err != nil {
 		log.Println("Failed to get proc/net/tcp information.")
-		return 0
+		return portStatistics
 	}
 
-	return len(netTCP)
+	// group TCP connections by "remote addr" and "state"
+	portStatistics["OTHER"] = make(map[string]int)
+	for _, c := range netTCP {
+		portState := portStateArray[c.St]
+		if c.RemPort < 32768 {
+			portName := portNameMap[c.RemPort]
+			if "" == portName {
+				portName = "unknown"
+			}
+			remoteAddr := fmt.Sprintf("%s [%d:%s]", c.RemAddr, c.RemPort, portName)
+			if portStatistics[remoteAddr] == nil {
+				portStatistics[remoteAddr] = make(map[string]int)
+			}
+			portStatistics[remoteAddr][portState] += 1
+		} else { // temporary remote ports
+			portStatistics["OTHER"][portState] += 1
+		}
+	}
+
+	return portStatistics
 }
 
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	podName := getPodName()
-	portUsedCount := getPortUsedCount()
-	portTotalCount := getPortTotalCount()
-	portUsage := float32(portUsedCount) * 100 / float32(portTotalCount)
 
-	outputFormat := `# HELP port_used Used Local Port Count
-# TYPE port_used gauge
-port_used{pod_name="%s"} %d
+	// total port count
+	portTotalCount := getPortTotalCount()
+	portTotalOutputFormat := `
 # HELP port_total Total Local Port Count
 # TYPE port_total gauge
 port_total{pod_name="%s"} %d
+# HELP port_used Used Local Port Count
+# TYPE port_used gauge`
+	output := fmt.Sprintf(portTotalOutputFormat, podName, portTotalCount)
+
+	// used port count for every remote addr
+	portUsedStatistics := getPortUsed()
+	portUsedCount := 0
+	portUsedOutputFormat := `
+port_used{pod_name="%s",remote_addr="%s",state="%s"} %d`
+	for remoteAddr,m := range portUsedStatistics {
+		for state,v := range m {
+			portUsedCount += v
+			output += fmt.Sprintf(portUsedOutputFormat, podName, remoteAddr, state, v)
+		}
+	}
+
+	// port usage percentage
+	portUsage := float32(portUsedCount) * 100 / float32(portTotalCount)
+	portUsageOutputFormat := `
 # HELP port_usage Local Port Usage Percentage
 # TYPE port_usage gauge
 port_usage{pod_name="%s"} %f`
-
-	output := fmt.Sprintf(outputFormat, podName, portUsedCount, podName, portTotalCount, podName, portUsage)
+	output += fmt.Sprintf(portUsageOutputFormat, podName, portUsage)
 
 	w.Write([]byte(output))
 }
