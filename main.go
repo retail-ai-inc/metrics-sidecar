@@ -27,16 +27,52 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
 	"github.com/prometheus/procfs"
 )
 
 var portNameMap map[uint64]string = map[uint64]string{
-	3306: "mysql",
-	6379: "redis",
-	27017: "mongo",
-	80: "http",
-	8080: "http",
-	443: "https",
+	7:     "echo",
+	20:    "ftp-data",
+	21:    "ftp",
+	22:    "ssh",
+	23:    "telnet",
+	25:    "smtp",
+	53:    "dns",
+	66:    "oracle-sql-net",
+	67:    "dhcp",
+	68:    "dhcp",
+	69:    "tftp",
+	80:    "http",
+	88:    "kerberos",
+	110:   "pop3",
+	143:   "imap",
+	443:   "https",
+	464:   "kerberos",
+	465:   "smtp-ssl",
+	523:   "ibm-db2",
+	587:   "smtp",
+	993:   "imap-ssl",
+	995:   "pop3-ssl",
+	1080:  "socks-proxy",
+	1194:  "openvpn",
+	1433:  "sql-server-2000",
+	1944:  "sql-server-7",
+	2483:  "oracle-db",
+	2484:  "oracle-db",
+	3128:  "http-proxy",
+	3306:  "mysql",
+	3389:  "rdp",
+	5432:  "postgres",
+	6379:  "redis",
+	6665:  "irc",
+	6669:  "irc",
+	6881:  "bit-torrent",
+	6999:  "bit-torrent",
+	8080:  "http-proxy",
+	11211: "memcached",
+	26257: "cockroach-db",
+	27017: "mongo-db",
 }
 
 var stateArray []string = []string{
@@ -151,8 +187,8 @@ port_total{pod_name="%s"} %d
 	portUsedCount := 0
 	portUsedOutputFormat := `
 port_used{pod_name="%s",remote_addr="%s",state="%s"} %d`
-	for remoteAddr,m := range portUsedStatistics {
-		for state,v := range m {
+	for remoteAddr, m := range portUsedStatistics {
+		for state, v := range m {
 			portUsedCount += v
 			output += fmt.Sprintf(portUsedOutputFormat, podName, remoteAddr, state, v)
 		}
@@ -176,5 +212,5 @@ func main() {
 	}
 	log.Println("Metrics server start...")
 	http.HandleFunc("/metrics", metricsHandler)
-	http.ListenAndServe("0.0.0.0:" + port, nil)
+	http.ListenAndServe("0.0.0.0:"+port, nil)
 }
