@@ -210,7 +210,7 @@ func main() {
 	if "" == port {
 		port = "9999"
 	}
-	log.Println("Metrics server start...")
+
 	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe("0.0.0.0:"+port, nil)
 }
