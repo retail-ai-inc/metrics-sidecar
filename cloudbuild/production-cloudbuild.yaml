@@ -1,0 +1,109 @@
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: build-image
+  entrypoint: 'bash'
+  args: [
+          '-c',
+          'docker build -t asia.gcr.io/$PROJECT_ID/metrics-sidecar:$_BRANCH_ -t asia.gcr.io/$PROJECT_ID/metrics-sidecar:$SHORT_SHA .'
+        ]
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: push-image-1
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/metrics-sidecar:$SHORT_SHA']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: push-image-2
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/metrics-sidecar:$_BRANCH_']
+
+# Update sidecar image tag in helm repository and trigger CD pipeline.
+
+- id: access the id_github file from secret manager
+  name: gcr.io/cloud-builders/gcloud
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      gcloud secrets versions access latest --secret=id_github_emoney-phase2-prod > /root/.ssh/id_github
+  volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+- id: set up git with key and domain
+  name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      chmod 600 /root/.ssh/id_github
+      cat <<EOF >/root/.ssh/config
+      Hostname github.com
+      IdentityFile /root/.ssh/id_github
+      EOF
+      ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+  volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+- id: connect to the repository
+  name: 'gcr.io/cloud-builders/git'
+  args:
+    - clone
+    - git@github.com:retail-ai-inc/emoney-phase2-helm.git
+    - deploy
+  volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+- id: switch to master branch
+  name: 'gcr.io/cloud-builders/gcloud'
+  dir: deploy
+  entrypoint: /bin/sh
+  args:
+    - '-c'
+    - |
+      set -x && \
+      git config --global user.email $(git log --format='%an <%ae>' -n 1 HEAD | sed 's/.*\<\([^>]*\)\>.*/\1/g') && \
+      git fetch origin master && git switch master
+  volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+- id: update metrics-sidecar image in helm values
+  name: 'gcr.io/cloud-builders/gcloud'
+  dir: deploy/charts/metrics-sidecar-injector
+  entrypoint: /bin/sh
+  args:
+    - '-c'
+    - |
+      set -x && \
+      VALUES="${_ENVIRONMENT_}-values.yaml" && \
+      if [ ! -f "$VALUES" ]; then \
+        echo "ERROR: $VALUES not found. Deploy metrics-sidecar-injector first." && exit 1; \
+      fi && \
+      sed -i "s/SIDECAR_COMMIT_SHA/${SHORT_SHA}/g" "$VALUES" && \
+      sed -i "s#\(.*/metrics-sidecar:\)[^[:space:]]*#\1${SHORT_SHA}#" "$VALUES"
+
+- id: push updated helm values to master branch
+  name: 'gcr.io/cloud-builders/gcloud'
+  dir: deploy/charts
+  entrypoint: /bin/sh
+  args:
+    - '-c'
+    - |
+      set -x && \
+      git add "metrics-sidecar-injector/${_ENVIRONMENT_}-values.yaml" && \
+      git commit \
+      --author="Cloud Build Service Account <$(gcloud auth list --filter=status:ACTIVE --format='value(account)')>" \
+      -m "Deploying images
+      - asia.gcr.io/$PROJECT_ID/metrics-sidecar:$SHORT_SHA
+      Built from commit ${COMMIT_SHA} of repository metrics-sidecar" && \
+      git push origin master
+  volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+timeout: 2400s
