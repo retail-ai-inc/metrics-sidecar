@@ -81,11 +81,11 @@ steps:
     - |
       set -x && \
       VALUES="${_ENVIRONMENT_}-values.yaml" && \
-      if [ ! -f "$VALUES" ]; then \
-        echo "ERROR: $VALUES not found. Deploy metrics-sidecar-injector first." && exit 1; \
+      if [ ! -f "$$VALUES" ]; then \
+        echo "ERROR: $$VALUES not found. Deploy metrics-sidecar-injector first." && exit 1; \
       fi && \
-      sed -i "s/SIDECAR_COMMIT_SHA/${SHORT_SHA}/g" "$VALUES" && \
-      sed -i "s#\(.*/metrics-sidecar:\)[^[:space:]]*#\1${SHORT_SHA}#" "$VALUES"
+      sed -i "s/SIDECAR_COMMIT_SHA/${SHORT_SHA}/g" "$$VALUES" && \
+      sed -i "s#\(.*/metrics-sidecar:\)[^[:space:]]*#\1${SHORT_SHA}#" "$$VALUES"
 
 - id: push updated helm values to develop branch
   name: 'gcr.io/cloud-builders/gcloud'
