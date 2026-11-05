@@ -12,15 +12,15 @@
 #
 # Reference: https://github.com/GoogleContainerTools/distroless/blob/main/base/README.md
 
-FROM golang:1.18 AS builder
+FROM golang:1.27.3 AS builder
 
 COPY go.mod /go/metrics-sidecar/
 COPY go.sum /go/metrics-sidecar/
-COPY main.go /go/metrics-sidecar/
+COPY *.go /go/metrics-sidecar/
 
 WORKDIR /go/metrics-sidecar/
 
-RUN go build -ldflags="-s -w" -o bin/metrics-sidecar main.go
+RUN go build -ldflags="-s -w" -o bin/metrics-sidecar .
 
 FROM gcr.io/distroless/base
 

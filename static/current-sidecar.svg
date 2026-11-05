@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 440" width="860" height="440" role="img" aria-label="Today: when a Deployment creates a Pod, the apiserver calls the injector over the public internet, and the injector adds a probe to every Pod; the probe shares the Pod network and counts connections; Prometheus scrapes it through a per-service Service">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --fg: #17202b;
+  --muted: #5b6878;
+  --line: #d6dde6;
+  --accent: #2f5fd0;
+  --accent-soft: #e7eefc;
+  --side: #b8620f;
+  --side-soft: #fbefe1;
+  --warn: #b42318;
+  --warn-soft: #fdeceb;
+  --ok: #1f7a4d;
+  --ok-soft: #e3f3ea;
+  --code-bg: #eef2f6;
+  --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+  --bg: #0f141a; --surface: #161d26; --fg: #e3e8ee; --muted: #98a4b3; --line: #2b3643;
+  --accent: #85a6ff; --accent-soft: #1b2946; --side: #f0a35a; --side-soft: #382814;
+  --warn: #ff8b7c; --warn-soft: #3a1d1b; --ok: #6fd39b; --ok-soft: #16342a; --code-bg: #1c242f;
+  }
+}
+svg { font-family: var(--font-body); }
+.bg { fill: var(--surface); }
+.box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.pod { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.cluster { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+.sidebox { fill: var(--side-soft); stroke: var(--side); stroke-width: 1.5; }
+.injbox { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.netbox { fill: var(--code-bg); stroke: var(--line); stroke-width: 1.5; }
+.badbox { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+.okbox { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+.t { fill: var(--fg); font-size: 14px; font-weight: 700; }
+.s { fill: var(--muted); font-size: 12px; }
+.m { fill: var(--muted); font-size: 11.5px; font-family: var(--font-mono); }
+.ts { fill: var(--side); font-size: 14px; font-weight: 700; }
+.ti { fill: var(--accent); font-size: 14px; font-weight: 700; }
+.tw { fill: var(--warn); font-size: 14px; font-weight: 700; }
+.to { fill: var(--ok); font-size: 14px; font-weight: 700; }
+.lbl { fill: var(--fg); font-size: 12.5px; font-weight: 500; }
+.chip { fill: var(--fg); font-size: 12.5px; }
+.line { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+.line-i { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+.line-s { stroke: var(--side); stroke-width: 1.6; fill: none; }
+.line-w { stroke: var(--warn); stroke-width: 1.6; fill: none; }
+.line-o { stroke: var(--ok); stroke-width: 1.6; fill: none; }
+.dash { stroke-dasharray: 5 4; }
+.divider { stroke: var(--line); stroke-width: 1.5; }
+.mk { fill: var(--muted); }
+.mk-i { fill: var(--accent); }
+.mk-s { fill: var(--side); }
+.mk-w { fill: var(--warn); }
+.mk-o { fill: var(--ok); }
+.msd { fill: var(--side); font-size: 12px; font-weight: 500; font-family: var(--font-mono); }
+.sw { fill: var(--warn); font-size: 12px; }
+.so { fill: var(--ok); font-size: 12.5px; font-weight: 500; }
+.newnode { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.num { fill: var(--accent); }
+.numt { fill: var(--surface); font-size: 12px; font-weight: 700; }
+</style>
+<rect class="bg" width="860" height="440" rx="10"/>
+        <defs>
+          <marker id="n1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="n1i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-i" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="n1s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="mk-s" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <rect class="box" x="10" y="24" width="190" height="104" rx="8"/>
+        <text class="t" x="26" y="50">App Deployment</text>
+        <text class="s" x="26" y="74">Pod template label:</text>
+        <text class="m" x="26" y="96">raicart.io/</text>
+        <text class="m" x="26" y="114">metrics-sidecar: "true"</text>
+
+        <rect class="box" x="300" y="24" width="170" height="104" rx="8"/>
+        <text class="t" x="316" y="50">kube-apiserver</text>
+        <text class="s" x="316" y="74">Label matches the</text>
+        <text class="s" x="316" y="94">webhook rule</text>
+
+        <rect class="injbox" x="600" y="24" width="250" height="104" rx="8"/>
+        <text class="ti" x="616" y="50">metrics-sidecar-injector</text>
+        <text class="s" x="616" y="72">Only 1 copy, in the manju cluster</text>
+        <text class="s" x="616" y="92">Public HTTPS · POST /mutate</text>
+        <text class="sw" x="616" y="114">Unreachable → Pod rejected (Fail)</text>
+
+        <path class="line" d="M200,60 L298,60" marker-end="url(#n1)"/>
+        <text class="lbl" x="208" y="50">① Create Pod</text>
+        <path class="line-i" d="M470,52 L598,52" marker-end="url(#n1i)"/>
+        <text class="lbl" x="484" y="42">② Modify it?</text>
+        <path class="line-i" d="M598,96 L472,96" marker-end="url(#n1i)"/>
+        <text class="lbl" x="484" y="118">③ Add a sidecar</text>
+
+        <path class="line" d="M385,128 L385,168" marker-end="url(#n1)"/>
+        <text class="lbl" x="395" y="154">④ Pod is created with metrics-sidecar</text>
+
+        <rect class="cluster" x="10" y="170" width="560" height="250" rx="12"/>
+        <text class="s" x="26" y="192">One node</text>
+
+        <rect class="pod" x="26" y="204" width="164" height="200" rx="8"/>
+        <text class="s" x="38" y="222">manju Pod</text>
+        <rect class="netbox" x="38" y="232" width="140" height="44" rx="6"/>
+        <text class="t" x="94" y="259">App</text>
+        <rect class="box" x="38" y="290" width="140" height="44" rx="6"/>
+        <text class="s" x="50" y="307">Shared network</text>
+        <text class="m" x="50" y="324">/proc/net/tcp</text>
+        <rect class="sidebox" x="38" y="348" width="140" height="44" rx="6"/>
+        <text class="s" x="50" y="364">Probe :9900</text>
+        <text class="msd" x="50" y="383">metrics-sidecar</text>
+        <path class="line" d="M108,276 L108,288" marker-end="url(#n1)"/>
+        <path class="line-s" d="M108,334 L108,346" marker-end="url(#n1s)"/>
+
+        <rect class="pod" x="208" y="204" width="164" height="200" rx="8"/>
+        <text class="s" x="220" y="222">gulab Pod</text>
+        <rect class="netbox" x="220" y="232" width="140" height="44" rx="6"/>
+        <text class="t" x="276" y="259">App</text>
+        <rect class="box" x="220" y="290" width="140" height="44" rx="6"/>
+        <text class="s" x="232" y="307">Shared network</text>
+        <text class="m" x="232" y="324">/proc/net/tcp</text>
+        <rect class="sidebox" x="220" y="348" width="140" height="44" rx="6"/>
+        <text class="s" x="232" y="364">Probe :9900</text>
+        <text class="msd" x="232" y="383">metrics-sidecar</text>
+        <path class="line" d="M290,276 L290,288" marker-end="url(#n1)"/>
+        <path class="line-s" d="M290,334 L290,346" marker-end="url(#n1s)"/>
+
+        <rect class="pod" x="390" y="204" width="164" height="200" rx="8"/>
+        <text class="s" x="402" y="222">monaka Pod</text>
+        <rect class="netbox" x="402" y="232" width="140" height="44" rx="6"/>
+        <text class="t" x="458" y="259">App</text>
+        <rect class="box" x="402" y="290" width="140" height="44" rx="6"/>
+        <text class="s" x="414" y="307">Shared network</text>
+        <text class="m" x="414" y="324">/proc/net/tcp</text>
+        <rect class="sidebox" x="402" y="348" width="140" height="44" rx="6"/>
+        <text class="s" x="414" y="364">Probe :9900</text>
+        <text class="msd" x="414" y="383">metrics-sidecar</text>
+        <path class="line" d="M472,276 L472,288" marker-end="url(#n1)"/>
+        <path class="line-s" d="M472,334 L472,346" marker-end="url(#n1s)"/>
+
+        <rect class="box" x="600" y="200" width="250" height="78" rx="8"/>
+        <text class="t" x="616" y="226">Prometheus</text>
+        <text class="s" x="616" y="248">Via each service's *-metrics</text>
+        <text class="s" x="616" y="268">Service, scrapes :9900/metrics</text>
+        <path class="line" d="M598,262 C578,262 576,370 546,370" marker-end="url(#n1)"/>
+        <text class="lbl" x="600" y="302">⑤ Periodic scrape</text>
+
+        <text class="lbl" x="600" y="336">Also needs maintaining:</text>
+        <text class="s" x="600" y="360">· injector + domain, IP, certificate</text>
+        <text class="s" x="600" y="382">· 1 webhook rule per cluster</text>
+        <text class="s" x="600" y="404">· Label + Service for every service</text>
+        <text class="sw" x="600" y="426">· Config change = restart all services</text>
+      </svg>
