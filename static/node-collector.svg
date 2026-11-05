@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 516" width="860" height="516" role="img" aria-label="New approach: a DaemonSet places one collector on every node, including newly added nodes; the collector uses hostPID to read each process's connection list; Prometheus scrapes the collectors directly">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --fg: #17202b;
+  --muted: #5b6878;
+  --line: #d6dde6;
+  --accent: #2f5fd0;
+  --accent-soft: #e7eefc;
+  --side: #b8620f;
+  --side-soft: #fbefe1;
+  --warn: #b42318;
+  --warn-soft: #fdeceb;
+  --ok: #1f7a4d;
+  --ok-soft: #e3f3ea;
+  --code-bg: #eef2f6;
+  --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+  --bg: #0f141a; --surface: #161d26; --fg: #e3e8ee; --muted: #98a4b3; --line: #2b3643;
+  --accent: #85a6ff; --accent-soft: #1b2946; --side: #f0a35a; --side-soft: #382814;
+  --warn: #ff8b7c; --warn-soft: #3a1d1b; --ok: #6fd39b; --ok-soft: #16342a; --code-bg: #1c242f;
+  }
+}
+svg { font-family: var(--font-body); }
+.bg { fill: var(--surface); }
+.box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.pod { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.cluster { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+.sidebox { fill: var(--side-soft); stroke: var(--side); stroke-width: 1.5; }
+.injbox { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.netbox { fill: var(--code-bg); stroke: var(--line); stroke-width: 1.5; }
+.badbox { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+.okbox { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; }
+.t { fill: var(--fg); font-size: 14px; font-weight: 700; }
+.s { fill: var(--muted); font-size: 12px; }
+.m { fill: var(--muted); font-size: 11.5px; font-family: var(--font-mono); }
+.ts { fill: var(--side); font-size: 14px; font-weight: 700; }
+.ti { fill: var(--accent); font-size: 14px; font-weight: 700; }
+.tw { fill: var(--warn); font-size: 14px; font-weight: 700; }
+.to { fill: var(--ok); font-size: 14px; font-weight: 700; }
+.lbl { fill: var(--fg); font-size: 12.5px; font-weight: 500; }
+.chip { fill: var(--fg); font-size: 12.5px; }
+.line { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+.line-i { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+.line-s { stroke: var(--side); stroke-width: 1.6; fill: none; }
+.line-w { stroke: var(--warn); stroke-width: 1.6; fill: none; }
+.line-o { stroke: var(--ok); stroke-width: 1.6; fill: none; }
+.dash { stroke-dasharray: 5 4; }
+.divider { stroke: var(--line); stroke-width: 1.5; }
+.mk { fill: var(--muted); }
+.mk-i { fill: var(--accent); }
+.mk-s { fill: var(--side); }
+.mk-w { fill: var(--warn); }
+.mk-o { fill: var(--ok); }
+.msd { fill: var(--side); font-size: 12px; font-weight: 500; font-family: var(--font-mono); }
+.sw { fill: var(--warn); font-size: 12px; }
+.so { fill: var(--ok); font-size: 12.5px; font-weight: 500; }
+.newnode { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.num { fill: var(--accent); }
+.numt { fill: var(--surface); font-size: 12px; font-weight: 700; }
+</style>
+<rect class="bg" width="860" height="516" rx="10"/>
+        <defs>
+          <marker id="p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="p1s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-s" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="p1o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk-o" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <rect class="sidebox" x="200" y="14" width="460" height="50" rx="8"/>
+        <text class="ts" x="216" y="36">DaemonSet: collector (reworked metrics-sidecar)</text>
+        <text class="s" x="216" y="56">Rule: 1 collector per node, follows nodes as they scale</text>
+
+        <path class="line-s" d="M250,64 L250,96" marker-end="url(#p1s)"/>
+        <path class="line-s" d="M592,64 L592,96" marker-end="url(#p1s)"/>
+        <path class="line-o" d="M640,64 C700,64 770,70 770,96" marker-end="url(#p1o)"/>
+        <text class="so" x="670" y="46">Auto-deployed</text>
+
+        <rect class="cluster" x="10" y="100" width="480" height="256" rx="12"/>
+        <text class="s" x="26" y="122">Node 1 (zoomed in)</text>
+        <rect class="box" x="26" y="134" width="140" height="74" rx="8"/>
+        <text class="t" x="40" y="164">manju Pod</text>
+        <text class="m" x="40" y="188">PID 12345</text>
+        <rect class="box" x="180" y="134" width="140" height="74" rx="8"/>
+        <text class="t" x="194" y="164">gulab Pod</text>
+        <text class="m" x="194" y="188">PID 23456</text>
+        <rect class="box" x="334" y="134" width="140" height="74" rx="8"/>
+        <text class="t" x="348" y="164">Other Pods</text>
+        <text class="m" x="348" y="188">PID …</text>
+
+        <path class="line-s" d="M96,276 L96,212" marker-end="url(#p1s)"/>
+        <text class="m" x="102" y="248">/proc/12345/net/tcp</text>
+        <path class="line-s" d="M250,276 L250,212" marker-end="url(#p1s)"/>
+        <text class="m" x="256" y="248">/proc/23456/net/tcp</text>
+        <path class="line-s" d="M404,276 L404,212" marker-end="url(#p1s)"/>
+        <text class="m" x="410" y="248">…</text>
+
+        <rect class="sidebox" x="26" y="278" width="448" height="62" rx="8"/>
+        <text class="ts" x="42" y="304">Collector (hostPID: sees all node processes)</text>
+        <text class="s" x="42" y="326">Reads /proc/&lt;pid&gt;/net/tcp + tcp6, sums up per Pod</text>
+
+        <rect class="cluster" x="510" y="100" width="165" height="256" rx="12"/>
+        <text class="s" x="522" y="122">Node 2</text>
+        <rect class="box" x="522" y="134" width="141" height="74" rx="8"/>
+        <text class="t" x="536" y="164">App Pod</text>
+        <text class="s" x="536" y="188">App container only</text>
+        <path class="line-s dash" d="M592,276 L592,212" marker-end="url(#p1s)"/>
+        <rect class="sidebox" x="522" y="278" width="141" height="62" rx="8"/>
+        <text class="ts" x="536" y="304">Collector</text>
+        <text class="s" x="536" y="326">1 per node</text>
+
+        <rect class="newnode" x="690" y="100" width="160" height="256" rx="12"/>
+        <text class="so" x="702" y="122">Newly added node</text>
+        <rect class="box" x="702" y="134" width="136" height="74" rx="8"/>
+        <text class="t" x="716" y="164">App Pod</text>
+        <text class="s" x="716" y="188">Newly scheduled</text>
+        <path class="line-s dash" d="M770,276 L770,212" marker-end="url(#p1s)"/>
+        <rect class="sidebox" x="702" y="278" width="136" height="62" rx="8"/>
+        <text class="ts" x="716" y="304">Collector</text>
+        <text class="s" x="716" y="326">Appears on join</text>
+
+        <rect class="box" x="10" y="372" width="480" height="62" rx="8"/>
+        <text class="t" x="26" y="396">Prometheus</text>
+        <text class="s" x="26" y="420">Scrapes each node's collector on :9900, no per-service Service</text>
+        <path class="line" d="M250,370 L250,344" marker-end="url(#p1)"/>
+
+        <rect class="okbox" x="510" y="372" width="340" height="62" rx="8"/>
+        <text class="to" x="526" y="396">Scale up → collector starts</text>
+        <text class="s" x="526" y="420">Scale down → collector removed, no manual work</text>
+
+        <text class="s" x="10" y="462">No longer needed: metrics-sidecar-injector and its public endpoint · per-cluster webhook rules</text>
+        <text class="s" x="10" y="484">· per-service label and *-metrics Service · the sidecar inside app Pods</text>
+        <text class="s" x="10" y="506">Collector config changes only update the DaemonSet; app services need no restart</text>
+      </svg>

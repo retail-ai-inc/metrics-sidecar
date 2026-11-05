@@ -27,9 +27,14 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/prometheus/procfs"
 )
+
+// procRoot is the procfs mount point. In node mode the collector runs with
+// hostPID, so this is the host's process table.
+var procRoot = "/proc"
 
 var portNameMap map[uint64]string = map[uint64]string{
 	7:     "echo",
@@ -102,7 +107,7 @@ func getPodName() string {
 
 func getPortTotalCount() int {
 	portTotalCount := 1
-	procFS, err := procfs.NewFS("/proc")
+	procFS, err := procfs.NewFS(procRoot)
 	if err != nil {
 		log.Println("Failed to read /proc.")
 		return portTotalCount
@@ -135,7 +140,7 @@ func getPortTotalCount() int {
 func getPortUsed() map[string]map[string]int {
 	portStatistics := map[string]map[string]int{}
 
-	procFS, err := procfs.NewFS("/proc")
+	procFS, err := procfs.NewFS(procRoot)
 	if err != nil {
 		log.Println("Failed to read /proc.")
 		return portStatistics
@@ -147,26 +152,7 @@ func getPortUsed() map[string]map[string]int {
 		return portStatistics
 	}
 
-	// group TCP connections by "remote addr" and "state"
-	portStatistics["OTHER"] = make(map[string]int)
-	for _, c := range netTCP {
-		portState := stateArray[c.St]
-		if c.RemPort < 32768 {
-			portName := portNameMap[c.RemPort]
-			if "" == portName {
-				portName = "unknown"
-			}
-			remoteAddr := fmt.Sprintf("%s [%d:%s]", c.RemAddr, c.RemPort, portName)
-			if portStatistics[remoteAddr] == nil {
-				portStatistics[remoteAddr] = make(map[string]int)
-			}
-			portStatistics[remoteAddr][portState] += 1
-		} else { // temporary remote ports
-			portStatistics["OTHER"][portState] += 1
-		}
-	}
-
-	return portStatistics
+	return groupConnections(netTCP)
 }
 
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
@@ -211,6 +197,25 @@ func main() {
 		port = "9999"
 	}
 
-	http.HandleFunc("/metrics", metricsHandler)
+	// MODE=sidecar (default): runs inside an app Pod and reports that Pod only.
+	// MODE=node: runs as a DaemonSet with hostPID and reports every Pod on the node.
+	switch mode := os.Getenv("MODE"); mode {
+	case "", "sidecar":
+		http.HandleFunc("/metrics", metricsHandler)
+	case "node":
+		nodeName := os.Getenv("NODE_NAME")
+		if "" == nodeName {
+			log.Fatal("NODE_NAME is required in node mode.")
+		}
+		pods, err := newPodCache(nodeName, os.Getenv("POD_SELECTOR"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		go pods.run(30 * time.Second)
+		http.HandleFunc("/metrics", nodeMetricsHandler(pods))
+	default:
+		log.Fatalf("Unknown MODE %q, expected sidecar or node.", mode)
+	}
+
 	http.ListenAndServe("0.0.0.0:"+port, nil)
 }
